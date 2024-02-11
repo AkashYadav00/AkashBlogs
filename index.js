@@ -1,5 +1,6 @@
 const path = require("path")
 const express = require("express");
+const redisCache = require('./database/redis');
 
 const app = express();
 const PORT = 8000;
