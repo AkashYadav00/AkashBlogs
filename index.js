@@ -12,7 +12,7 @@ app.set("views", path.resolve("./views"))
 app.use(express.urlencoded({extended: false})); // this is required since we are working with forms
 
 app.get("/", (req, res) => {
-    res.render("home");
+    res.redirect("/blog/home");
 });
 
 app.use("/blog", blogRoute)
