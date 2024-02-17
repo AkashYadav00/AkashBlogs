@@ -3,11 +3,46 @@
 
 <head>
     <%- include("./partials/head") %>
-    <title>HomePage</title>
+    <title>Akash Blogs</title>
+    <style>
+        .blog-card {
+            margin-bottom: 20px;
+            width: 1500px;
+        }
+
+        .add-blog-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+    </style>
 </head>
 
 <body>
     <%- include("./partials/scripts") %>
+    <div class="container mt-5">
+        <a href="/blog/add-blog" class="btn btn-primary add-blog-button">Add your blog</a>
+        <h1 class="text-center mb-4">Blogs</h1>
+        <div>
+            <% blogsMockDB.forEach((blog, index)=> { %>
+                <div class="col-md-4">
+                    <div class="card blog-card">
+                        <a href="/blog/view-blog?title=<%= encodeURIComponent(blog.title) %>"
+                            class="card blog-card">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <%= blog.title %>
+                                </h5>
+                                <p class="card-text">
+                                    <%= blog.blogText %>
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </div>
 </body>
 
 </html>
