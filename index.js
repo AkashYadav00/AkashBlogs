@@ -1,6 +1,7 @@
 const path = require("path")
 const express = require("express");
 const redisCache = require('./database/redis');
+const postgresClient = require("./database/postgres")
 const blogRoute = require("./routes/blogs");
 
 const app = express();
@@ -16,5 +17,6 @@ app.get("/", (req, res) => {
 });
 
 app.use("/blog", blogRoute)
+postgresClient.init();
 
 app.listen(PORT, () => console.log("Inital setup done"))

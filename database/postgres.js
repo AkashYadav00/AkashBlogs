@@ -5,12 +5,11 @@ const pgClient = new Client({
     user: "postgres",
     port: 5432,
     password: "postgres",
-    database: "blogs"
+    database: "blogs_db"
 });
 
-const MAX_BLOGS_ALLOWED = 1000; // chosen an arbitary number
+const MAX_BLOGS_ALLOWED = 100; // chosen an arbitary number
 
-console.log("inside postgres");
 
 async function connectToDatabase() {
     try {
@@ -29,10 +28,7 @@ async function createTable() {
                 id SERIAL PRIMARY KEY,
                 title VARCHAR(255) NOT NULL,
                 content TEXT NOT NULL,
-                created_by VARCHAR(100) NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_by VARCHAR(100),
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
         console.log("Table created successfully");
@@ -47,62 +43,65 @@ Caution: Pagination is required. Make sure blogs count is not too much
 */
 async function selectAllFromBlog() {
     try {
-        const blogsCount = await pgClient.query("COUNT * FROM Blog");
-        if (blogsCount > MAX_BLOGS_ALLOWED) {
-            console.error("Too many blogs");
-            return;
-        }
         const result = await pgClient.query("SELECT * FROM Blog;");
-        console.log("All rows from Blog table:", result.rows);
+        return result.rows;
     } catch (error) {
         console.error("Error selecting all rows from Blog table:", error);
+        return [];
     }
 }
 
-async function disconnectFromDatabase() {
+async function findBlogFromId(id) {
     try {
-        await pgClient.end();
-        console.log("Disconnected from the database");
+        const result = await pgClient.query({
+            text: `SELECT * FROM Blog where id=$1;`,
+            values: [id]
+        });
+        console.log("inside findBlogFromId, result.rows = " + JSON.stringify(result.rows));
+        return result.rows;
     } catch (error) {
-        console.error("Error disconnecting from the database:", error);
+        console.error("Error selecting all rows from Blog table:", error);
+        return [];
     }
 }
 
 async function insertBlogIntoDatabase(title, content) {
     try {
-        const created_by = "admin";
-        const updated_by = "admin";
         const created_at = new Date().toISOString();
-        const updated_at = new Date().toISOString();
-        
         const query = {
             text: `
-                INSERT INTO Blog (title, content, created_by, created_at, updated_by, updated_at)
-                VALUES ($1, $2, $3, $4, $5, $6)
+                INSERT INTO Blog (title, content, created_at)
+                VALUES ($1, $2, $3)
             `,
-            values: [title, content, created_by, created_at, updated_by, updated_at]
+            values: [title, content, created_at]
         };
-        await pgClient.query("");
+        await pgClient.query(query);
         console.log("Blog inserted successfully");
     } catch (error) {
         console.error("Error inserting blog in Blog table:", error);
     }
 }
 
+async function init() {
+    console.log("inside postgres");
+    connectToDatabase()
+        .then(() => {
+            return createTable();
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            throw new Error("Error while connecting Postgres");
+        });
+        console.log(" postgres completed");
+}
 
-connectToDatabase()
-    .then(() => {
-        return createTable();
-    })
-    .catch(error => {
-        console.error("Error:", error);
-    })
-    .finally(() => {
-        disconnectFromDatabase();
-    });
 
-
-module.exports = {insertBlogIntoDatabase};
+module.exports = { 
+    findBlogFromId,
+    init, 
+    insertBlogIntoDatabase,
+    selectAllFromBlog,
+ };
 
 
 

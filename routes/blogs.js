@@ -1,73 +1,24 @@
-const { Router, response } = require("express");
-const postgres = require("../database/postgres")
+const postgresClient = require("../database/postgres")
+const { Router } = require("express");
 
 const router = Router();
 
-const blogsMockDB = [
-    {
-        "title": "abc",
-        "blogText": "defdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkm"
-    }, 
-    {
-        "title": "abc2",
-        "blogText": "def2"
-    },
-    {
-        "title": "abc",
-        "blogText": "def"
-    }, 
-    {
-        "title": "abc",
-        "blogText": "defdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkm"
-    }, 
-    {
-        "title": "abc2",
-        "blogText": "def2"
-    },
-    {
-        "title": "abc",
-        "blogText": "def"
-    }, 
-    {
-        "title": "abc",
-        "blogText": "defdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkm"
-    }, 
-    {
-        "title": "abc2",
-        "blogText": "def2"
-    },
-    {
-        "title": "abc",
-        "blogText": "def"
-    }, 
-    {
-        "title": "abc",
-        "blogText": "defdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkmdefdfjdifjdifdfkdmkfmdkfdkfmkdmfkdmfkm"
-    }, 
-    {
-        "title": "abc2",
-        "blogText": "def2"
-    },
-    {
-        "title": "abc",
-        "blogText": "def"
-    }, 
-];
-
 // Renders the home page which displays all the blogs
-router.get("/home", (req, res) => {
+router.get("/home", async (req, res) => {
+    const blogs = await postgresClient.selectAllFromBlog();
     return res.render("home", {
-        blogsMockDB: blogsMockDB
+        blogsList: blogs
     });
 });
 
 // Given the blog title, it finds the blog and renders it
-router.get("/view-blog", (req, res) => {
-    const blogTitle = req.query.title; 
-    const blog = blogsMockDB.find(blog => blog.title === blogTitle);
+router.get("/view-blog", async (req, res) => {
+    console.log(req.query);
+    const blodId = req.query.blogId; 
+    const blog = await postgresClient.findBlogFromId(blodId);
     return res.render("view-blog", {
-        title: blog.title,
-        blogText: blog.blogText
+        title: blog[0].title,
+        blogText: blog[0].content
     });
 });
 
@@ -77,13 +28,10 @@ router.get("/add-blog", (req, res) => {
 });
 
 // POST API to add the blog
-router.post("/addBlog", (req, res) => {
+router.post("/addBlog", async (req, res) => {
     // TODO: Add Http status code in response
     const{title, blog} = req.body;
-    blogsMockDB.push({
-        "title": title,
-        "blogText": blog
-    });
+    await postgresClient.insertBlogIntoDatabase(title, blog);
     return res.redirect("/blog/home");
 });
 

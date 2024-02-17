@@ -24,17 +24,17 @@
         <a href="/blog/add-blog" class="btn btn-primary add-blog-button">Add your blog</a>
         <h1 class="text-center mb-4">Blogs</h1>
         <div>
-            <% blogsMockDB.forEach((blog, index)=> { %>
+            <% blogsList.forEach((blog, index)=> { %>
                 <div class="col-md-4">
                     <div class="card blog-card">
-                        <a href="/blog/view-blog?title=<%= encodeURIComponent(blog.title) %>"
+                        <a href="/blog/view-blog?blogId=<%= encodeURIComponent(blog.id) %>"
                             class="card blog-card">
                             <div class="card-body">
                                 <h5 class="card-title">
                                     <%= blog.title %>
                                 </h5>
                                 <p class="card-text">
-                                    <%= blog.blogText %>
+                                    <%= blog.content %>
                                 </p>
                             </div>
                         </a>
