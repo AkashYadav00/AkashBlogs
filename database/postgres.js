@@ -14,7 +14,6 @@ const MAX_BLOGS_ALLOWED = 100; // chosen an arbitary number
 async function connectToDatabase() {
     try {
         await pgClient.connect();
-        console.log("Connected to the database");
     } catch (error) {
         console.error("Error connecting to the database:", error);
     }
@@ -31,7 +30,6 @@ async function createTable() {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
-        console.log("Table created successfully");
     } catch (error) {
         console.error("Error creating table:", error);
     }
@@ -57,7 +55,6 @@ async function findBlogFromId(id) {
             text: `SELECT * FROM Blog where id=$1;`,
             values: [id]
         });
-        console.log("inside findBlogFromId, result.rows = " + JSON.stringify(result.rows));
         return result.rows;
     } catch (error) {
         console.error("Error selecting all rows from Blog table:", error);
@@ -76,14 +73,12 @@ async function insertBlogIntoDatabase(title, content) {
             values: [title, content, created_at]
         };
         await pgClient.query(query);
-        console.log("Blog inserted successfully");
     } catch (error) {
         console.error("Error inserting blog in Blog table:", error);
     }
 }
 
 async function init() {
-    console.log("inside postgres");
     connectToDatabase()
         .then(() => {
             return createTable();
@@ -92,7 +87,6 @@ async function init() {
             console.error("Error:", error);
             throw new Error("Error while connecting Postgres");
         });
-        console.log(" postgres completed");
 }
 
 
@@ -102,29 +96,3 @@ module.exports = {
     insertBlogIntoDatabase,
     selectAllFromBlog,
  };
-
-
-
-
-/*
-
-Blog: 
--> title
--> content
--> createdBy
--> createdAt
--> updatedBy
--> updatedAt
-
-
-CREATE TABLE Blog (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    content TEXT NOT NULL,
-    created_by VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_by VARCHAR(100),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-*/

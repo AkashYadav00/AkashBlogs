@@ -3,7 +3,6 @@ const redis = require("redis");
 const HOST = "127.0.0.1";
 const PORT = "6379";
 
-console.log("Inside redis .js");
 
 var redisClient = redis.createClient({
     port: PORT,
@@ -37,32 +36,34 @@ redisClient.on('end', function () {
 async function connectToRedis() {
     try {
         await redisClient.connect();
-        console.log('Connected to Redis');
     } catch (error) {
         console.error('Error connecting to Redis:', error);
     }
 }
 
-// Call the async function
-connectToRedis();
-
-module.exports.set = (key, value) => {
-    redisClient.set(key, value, redis.print);
-    return 'done';
+async function set(key, value) {
+    await redisClient.set(key, JSON.stringify(value));
+    return value;
 }
 
-module.exports.get = (key) => {
-    return new Promise((resolve, reject) => {
-        redisClient.get(key, function (error, result) {
-            if (error) {
-                console.log(error);
-                reject(error);
-            }
-            resolve(result);
-        });
-    });
+async function get(key) {
+    const value = await redisClient.get(key);
+    return JSON.parse(value);
 }
 
-module.exports.close = () => {
-    client.quit();
+async function init() {
+    try {
+        // Configure Redis with LRU eviction policy
+        await connectToRedis();
+        await redisClient.sendCommand(['config', 'set', 'maxmemory', '100mb']); // Set maximum memory limit (e.g., 100 MB)
+        await redisClient.sendCommand(['config', 'set', 'maxmemory-policy', 'volatile-lru']); // Set eviction policy (e.g., Volatile LRU)
+    } catch (error) {
+        console.error('Error configuring Redis:', error);
+    }
 }
+
+module.exports = {
+    init,
+    get,
+    set
+};

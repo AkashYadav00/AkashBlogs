@@ -1,4 +1,5 @@
 const postgresClient = require("../database/postgres")
+const redisClient = require("../database/redis");
 const { Router } = require("express");
 
 const router = Router();
@@ -13,9 +14,13 @@ router.get("/home", async (req, res) => {
 
 // Given the blog title, it finds the blog and renders it
 router.get("/view-blog", async (req, res) => {
-    console.log(req.query);
-    const blodId = req.query.blogId; 
-    const blog = await postgresClient.findBlogFromId(blodId);
+    const blogId = req.query.blogId; 
+    const redisKey = "blogs:" + blogId;
+    let blog = await redisClient.get(redisKey);
+    if (blog === null) {
+        blog = await postgresClient.findBlogFromId(blogId);
+        await redisClient.set(redisKey, blog);
+    }
     return res.render("view-blog", {
         title: blog[0].title,
         blogText: blog[0].content

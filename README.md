@@ -9,3 +9,8 @@ This is the blogging platform for ziffi games
  CREATE DATABASE blogs_db;
  \list: to list all the databases
   DROP DATABASE blogs; : to drop the database
+
+
+# Redis-cli commands
+redis-cli
+KEYS * : to sow all the keys
