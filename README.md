@@ -2,6 +2,13 @@
 This is the blogging platform for ziffi games
 
 
+# Setup
+1. Install node, redis, postgres
+2. Run redis and postgres on local
+3. Clone this repo
+4. run: `npm install`
+5. run: `npm run dev` or `node index.js`
+6. Open `localhost:8000/blog/home`
 
 
 # Postgres Commands
@@ -23,9 +30,9 @@ This is the blogging platform for ziffi games
 redis-cli
 KEYS * : to sow all the keys
 
+# Use below redis configurations if you want to run redis locally
 const HOST = "127.0.0.1";
 const PORT = "6379";
-
 
 var redisClient = redis.createClient({
     port: PORT,
@@ -52,3 +59,4 @@ var redisClient = redis.createClient({
     d. Light and dark theme
 10. Take care of edge cases like when db (postgres or redis) is disconnected. 
 11. Security: Authentication & Authorization of users, removing secrets from code.
+12. Setup configs for Redis, Postgres and Express Port.
