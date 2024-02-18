@@ -1,5 +1,6 @@
 const postgresClient = require("../database/postgres")
 const redisClient = require("../database/redis");
+const stringUtils = require("../utils/stringUtils");
 const { Router } = require("express");
 
 const router = Router();
@@ -10,6 +11,7 @@ router.get("/home", async (req, res) => {
     let blogs = await redisClient.get(REDIS_KEY_HOME_SCREEN);
     if (blogs == null) {
         blogs = await postgresClient.selectAllFromBlog();
+        blogs = stringUtils.reduceBlogsContentToTwoSentence(blogs);
         await redisClient.set(REDIS_KEY_HOME_SCREEN, blogs);
     }
     return res.render("home", {
