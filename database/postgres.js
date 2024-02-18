@@ -1,18 +1,23 @@
 const { Client } = require("pg")
 
+const connectionString = "postgres://blogs_wvkw_user:1gk1kgZVGtq2VGaUT2KOaWaLADMTk8gC@dpg-cn4c8j7qd2ns73elh8sg-a.singapore-postgres.render.com/blogs_wvkw";
+const parsedConnectionString = new URL(connectionString);
+
 const pgClient = new Client({
-    host: "localhost",
-    user: "postgres",
-    port: 5432,
-    password: "postgres",
-    database: "blogs_db"
+    user: parsedConnectionString.username,
+    host: parsedConnectionString.hostname,
+    database: parsedConnectionString.pathname.substring(1),
+    password: parsedConnectionString.password,
+    port: parsedConnectionString.port,
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
-
-
 
 async function connectToDatabase() {
     try {
         await pgClient.connect();
+        console.log("Postgres connected");
     } catch (error) {
         console.error("Error connecting to the database:", error);
     }

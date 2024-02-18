@@ -18,6 +18,5 @@ app.get("/", (req, res) => {
 
 app.use("/blog", blogRoute)
 postgresClient.init();
-redisClient.init();
 
 app.listen(PORT, () => console.log("Inital setup done"))

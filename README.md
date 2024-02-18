@@ -10,10 +10,28 @@ This is the blogging platform for ziffi games
  \list: to list all the databases
   DROP DATABASE blogs; : to drop the database
 
+  const pgClient = new Client({
+    host: "localhost",
+    user: "postgres",
+    port: 5432,
+    password: "postgres",
+    database: "blogs_db"
+});
+
 
 # Redis-cli commands
 redis-cli
 KEYS * : to sow all the keys
+
+const HOST = "127.0.0.1";
+const PORT = "6379";
+
+
+var redisClient = redis.createClient({
+    port: PORT,
+    host: HOST,
+    // password  : 'redispassword',
+});
 
 
 # TODOs
@@ -33,3 +51,4 @@ KEYS * : to sow all the keys
     c. Home page themes.
     d. Light and dark theme
 10. Take care of edge cases like when db (postgres or redis) is disconnected. 
+11. Security: Authentication & Authorization of users, removing secrets from code.
