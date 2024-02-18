@@ -27,3 +27,9 @@ KEYS * : to sow all the keys
 6. Move from local databases to cloud databases (Free option: https://render.com/)
 7. Deploy application
 8. Setup alarms and monitoring
+9. Improve UI
+    a. There are some components like back button where code is duplicated. Create a separate component.
+    b. Color theme, animation, etc
+    c. Home page themes.
+    d. Light and dark theme
+10. Take care of edge cases like when db (postgres or redis) is disconnected. 
