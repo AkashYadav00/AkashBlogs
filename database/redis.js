@@ -51,6 +51,17 @@ async function get(key) {
     return JSON.parse(value);
 }
 
+async function deleteKey(key) {
+    try {
+        const result = await redisClient.del(key);
+        console.log(`Key '${key}' deleted successfully.`);
+        return result === 1;
+    } catch (error) {
+        console.error(`Error deleting key '${key}':`, error);
+        return false;
+    }
+}
+
 async function init() {
     try {
         // Configure Redis with LRU eviction policy
@@ -64,6 +75,7 @@ async function init() {
 
 module.exports = {
     init,
+    deleteKey,
     get,
     set
 };

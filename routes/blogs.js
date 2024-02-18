@@ -3,10 +3,15 @@ const redisClient = require("../database/redis");
 const { Router } = require("express");
 
 const router = Router();
+const REDIS_KEY_HOME_SCREEN = "blogs:home";
 
 // Renders the home page which displays all the blogs
 router.get("/home", async (req, res) => {
-    const blogs = await postgresClient.selectAllFromBlog();
+    let blogs = await redisClient.get(REDIS_KEY_HOME_SCREEN);
+    if (blogs == null) {
+        blogs = await postgresClient.selectAllFromBlog();
+        await redisClient.set(REDIS_KEY_HOME_SCREEN, blogs);
+    }
     return res.render("home", {
         blogsList: blogs
     });
@@ -36,7 +41,8 @@ router.get("/add-blog", (req, res) => {
 router.post("/addBlog", async (req, res) => {
     // TODO: Add Http status code in response
     const{title, blog} = req.body;
-    await postgresClient.insertBlogIntoDatabase(title, blog);
+    await redisClient.deleteKey(REDIS_KEY_HOME_SCREEN); // clear cache for home screen as new blog added
+    await postgresClient.insertBlogIntoDatabase(title, blog); 
     return res.redirect("/blog/home");
 });
 
