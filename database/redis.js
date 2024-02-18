@@ -1,7 +1,8 @@
 const redis = require("redis");
 
-const redisUrl = "rediss://red-cn4bvbvqd2ns73elfn40:nlDJaf3pWuFW2CnqRuKrLN0bxd41vycM@singapore-redis.render.com:6379";
-const parsedUrl = new URL(redisUrl);
+const redisUrlExternal = "rediss://red-cn4bvbvqd2ns73elfn40:nlDJaf3pWuFW2CnqRuKrLN0bxd41vycM@singapore-redis.render.com:6379";
+const redisUrlInternal = "redis://red-cn4bvbvqd2ns73elfn40:6379";
+const parsedUrl = new URL(redisUrlInternal);
 
 const redisClient = redis.createClient({
     port: parsedUrl.port,
