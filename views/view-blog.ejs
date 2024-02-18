@@ -3,53 +3,77 @@
 
 <head>
     <%- include("./partials/head") %>
-    <title>View Blog</title>
+        <title>View Blog</title>
 
-    <!-- Add your custom styles here -->
-    <style>
-        /* Add your custom styles here */
-        .blog-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            overflow-wrap: break-word; /* Allow words to break */
-        }
+        <!-- Add your custom styles here -->
+        <style>
+            /* Add your custom styles here */
+            body {
+                background-color: #1e1e1e;
+                color: #ffffff;
+                font-family: Arial, sans-serif;
+            }
 
-        .blog-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+            }
 
-        .blog-content {
-            font-size: 18px;
-            line-height: 1.6;
-        }
+            .back-button {
+                margin-bottom: 40px;
+                margin-left: 0px;
+                background-color: #6c5ce6;
+                color: #ffffff;
+                border: none;
+                border-radius: 5px;
+                padding: 10px 20px;
+                text-decoration: none;
+                transition: background-color 0.3s;
+            }
 
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-        }
-    </style>
+            .back-button:hover {
+                background-color: #4834d4;
+            }
+
+            .blog-container {
+                background-color: #2d3d03;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+            }
+
+            .blog-title {
+                font-size: 28px;
+                font-weight: bold;
+                color: #6c5ce7;
+                margin-bottom: 20px;
+            }
+
+            .blog-content {
+                font-size: 18px;
+                line-height: 1.6;
+            }
+        </style>
 </head>
 
 <body>
     <%- include("./partials/scripts") %>
-    <div class="container mt-5">
-        <a href="/blog/home" class="btn btn-primary back-button">Back to Home</a> <!-- Add Back button -->
-        <h1 class="text-center mb-4">View Blog</h1>
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="blog-container">
-                    <h2 class="blog-title"><%= title %></h2>
-                    <div class="blog-content">
-                        <%= blogText %>
+        <div class="container mt-5">
+            <a href="/blog/home" class="btn btn-primary back-button">Back to Home</a> <!-- Add Back button -->
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="blog-container">
+                        <h2 class="blog-title">
+                            <%= title %>
+                        </h2>
+                        <div class="blog-content">
+                            <%= blogText %>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
 </body>
 
