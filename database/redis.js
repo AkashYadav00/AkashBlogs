@@ -1,18 +1,18 @@
 const redis = require("redis");
 
-const HOST = "127.0.0.1";
-const PORT = "6379";
+const redisUrl = "rediss://red-cn4bvbvqd2ns73elfn40:nlDJaf3pWuFW2CnqRuKrLN0bxd41vycM@singapore-redis.render.com:6379";
+const parsedUrl = new URL(redisUrl);
 
-
-var redisClient = redis.createClient({
-    port: PORT,
-    host: HOST,
-    // password  : 'redispassword',
+const redisClient = redis.createClient({
+    port: parsedUrl.port,
+    host: parsedUrl.hostname,
+    auth_pass: parsedUrl.password,
+    tls: {
+        rejectUnauthorized: false // For self-signed certificates (remove this in production)
+    }
 });
 
-redisClient.on('connect', function () {
-    console.log('Redis Database connected' + '\n');
-});
+redisClient.connect();
 
 redisClient.on('reconnecting', function () {
     console.log('Redis client reconnecting');
@@ -29,17 +29,7 @@ redisClient.on('error', function (err) {
 redisClient.on('end', function () {
     console.log('\nRedis client disconnected');
     console.log('Server is going down now...');
-    process.exit();
 });
-
-
-async function connectToRedis() {
-    try {
-        await redisClient.connect();
-    } catch (error) {
-        console.error('Error connecting to Redis:', error);
-    }
-}
 
 async function set(key, value) {
     await redisClient.set(key, JSON.stringify(value));
@@ -62,19 +52,8 @@ async function deleteKey(key) {
     }
 }
 
-async function init() {
-    try {
-        // Configure Redis with LRU eviction policy
-        await connectToRedis();
-        await redisClient.sendCommand(['config', 'set', 'maxmemory', '100mb']); // Set maximum memory limit (e.g., 100 MB)
-        await redisClient.sendCommand(['config', 'set', 'maxmemory-policy', 'volatile-lru']); // Set eviction policy (e.g., Volatile LRU)
-    } catch (error) {
-        console.error('Error configuring Redis:', error);
-    }
-}
 
 module.exports = {
-    init,
     deleteKey,
     get,
     set
