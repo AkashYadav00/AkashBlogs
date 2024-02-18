@@ -8,7 +8,6 @@ const pgClient = new Client({
     database: "blogs_db"
 });
 
-const MAX_BLOGS_ALLOWED = 100; // chosen an arbitary number
 
 
 async function connectToDatabase() {
